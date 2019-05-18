@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CNV2019.iml" filepath="$PROJECT_DIR$/CNV2019.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LoadBalancer/LoadBalancer.iml" filepath="$PROJECT_DIR$/LoadBalancer/LoadBalancer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Server/Server.iml" filepath="$PROJECT_DIR$/Server/Server.iml" />
     </modules>
   </component>
 </project>
