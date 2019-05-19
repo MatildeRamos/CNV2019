@@ -1,4 +1,6 @@
-	/* ICount.java
+package pt.ulisboa.tecnico.cnv.solver;
+
+/* ICount.java
  * Sample program using BIT -- counts the number of instructions executed.
  *
  * Copyright (c) 1997, The Regents of the University of Colorado. All
