@@ -27,6 +27,10 @@ public class WebServersManager {
         return webServersManager;
     }
 
+    public int getNumServer(){
+        return webServers.size();
+    }
+
     private static void init() {
 
         /*
@@ -123,7 +127,7 @@ public class WebServersManager {
                             state = instance.getState().getName(),
                             instance.getMonitoring().getState(),
                             ipAddress = instance.getPublicIpAddress());
-                    if(imageId.equals("ami-0c80afef49b12a338") && instanceType.equals("t2.micro")) {
+                    if(imageId.equals("ami-0c80afef49b12a338") && instanceType.equals("t2.micro") && !state.equals(InstanceStateName.Terminated.toString()) && !state.equals(InstanceStateName.ShuttingDown.toString())) {
                         webServers.add(new WebServerWrapper(id,  ipAddress));
                     }
                 }
@@ -138,5 +142,13 @@ public class WebServersManager {
         if(webServers.isEmpty()) {
             createNewWebServer();
         }
+    }
+
+    public ArrayList<Double> getWSFullness(){
+        ArrayList<Double> wsFullness = new ArrayList<>();
+        for(WebServerWrapper ws : webServers){
+            wsFullness.add(ws.getWorkFullness());
+        }
+        return wsFullness;
     }
 }

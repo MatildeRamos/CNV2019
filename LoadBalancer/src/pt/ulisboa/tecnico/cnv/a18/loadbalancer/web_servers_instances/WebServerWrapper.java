@@ -13,10 +13,12 @@ public class WebServerWrapper {
         PENDING, RUNNING, STOPPING, STOPPED, SHUTTING_DOWN, TERMINATED
     }
 
+    //TODO
+    private final long _maxLoad = 5L;
     private State _state;
     private String _id;
     private String _address;
-    private long _totalCost = 0;
+    private long _totalCost = 0L;
     private HashMap<Request, Long> _currentRequests = new HashMap<>();
 
     private Timer t1;
@@ -118,5 +120,10 @@ public class WebServerWrapper {
     public void addRequest(Request request, long cost) {
         _currentRequests.put(request, cost);
         _totalCost += cost;
+    }
+
+    public Double getWorkFullness(){
+        Long l = new Long(_maxLoad);
+        return new Double((_totalCost/l.doubleValue())*100);
     }
 }
