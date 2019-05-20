@@ -62,7 +62,7 @@ public class AutoScaler implements Runnable {
             }
             else {
                 if(webServersManager.getNumServer() >= decreaseGroupSize.get_numServers()){
-                    //webServersManager.shutdownInstance();
+                    webServersManager.stopLeastWorking();
                 }
                 else {
                     ArrayList wsFullness = webServersManager.getWSFullness();
@@ -81,7 +81,7 @@ public class AutoScaler implements Runnable {
                         AutoScaler.timeStampsOverload = 0;
                     }
                     else if(AutoScaler.timeStampsUnderload >= (decreaseGroupSize.get_secondsOverThreshold()/1000)){
-                        //webServersManager.shutdownInstance();
+                        webServersManager.stopLeastWorking();
                         AutoScaler.timeStampsUnderload = 0;
                     }
                 }

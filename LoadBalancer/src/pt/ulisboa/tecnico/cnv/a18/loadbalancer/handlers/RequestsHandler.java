@@ -33,7 +33,10 @@ public class RequestsHandler implements HttpHandler {
         //Calculate request Cost through estimations
         long requestCode = computeRequestCost(newRequest);//TODO tavam a falar de um objecto request, será um bom sitio para usalo I guess
 
-        byte[] response = redirectRequest(query, requestCode, requestId, newRequest);
+        byte[] response = null;
+        while (response == null){
+            response = redirectRequest(query, requestCode, requestId, newRequest);
+        }
 
         // Send response to browser.
         httpExchange.sendResponseHeaders(200, response.length);
@@ -58,9 +61,9 @@ public class RequestsHandler implements HttpHandler {
 
     //TODO what should this return, as to do with what we will be doing from here on
     private byte[] redirectRequest(String request, long requestCost, String requestId, Request req) {
+        WebServerWrapper server = serversManager.getWebServer(requestCost);
 		try {
 			//Create connection with the chosen ec2 webServer instance
-			WebServerWrapper server = serversManager.getWebServer(requestCost);
 			//TODO idle time do load balancer (esperar x tempo por resposta, passado esse tempo - a vm deve ter morrido - reenviar o pedido para outra vm)
 
             //Add to the current cost of a server requests, the cost of the new request
@@ -89,8 +92,10 @@ public class RequestsHandler implements HttpHandler {
 			return buffer;
 
 		} catch(IOException e) {
-			e.printStackTrace(); //TODO do something usefull here
+		    //TODO
+			e.printStackTrace();
+            server.endRequest(req);
+            return null; //handler catches it and tries again
 		}
-		return null; //TODO what should happen here?
     }
 }

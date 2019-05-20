@@ -9,7 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class WebServerWrapper {
-    static enum State {
+    enum State {
         PENDING, RUNNING, STOPPING, STOPPED, SHUTTING_DOWN, TERMINATED
     }
 
@@ -84,6 +84,14 @@ public class WebServerWrapper {
         t1.schedule(hasStartedCheck, 0,10000);
     }
 
+    public synchronized void shutdownGracefully(){
+        _state = State.SHUTTING_DOWN;
+
+    }
+
+    public String get_id(){
+        return _id;
+    }
     private void setAddress(String ip) {
         _address = ip + ":8000"; //TODO get the port value from properties file
     }
@@ -115,6 +123,9 @@ public class WebServerWrapper {
     public void endRequest(Request request) {
         _totalCost -= _currentRequests.get(request);
         _currentRequests.remove(request);
+        if(_state == State.SHUTTING_DOWN && _totalCost == 0){
+            WebServersManager.getInstance().removeWebServer(this);
+        }
     }
 
     public void addRequest(Request request, long cost) {
@@ -123,7 +134,7 @@ public class WebServerWrapper {
     }
 
     public Double getWorkFullness(){
-        Long l = new Long(_maxLoad);
-        return new Double((_totalCost/l.doubleValue())*100);
+        Long l = _maxLoad;
+        return (_totalCost/l.doubleValue())*100;
     }
 }

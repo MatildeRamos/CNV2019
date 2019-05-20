@@ -64,7 +64,8 @@ public class WebServersManager {
         long thisCost;
         for (WebServerWrapper server : webServers) {
             thisCost = server.getCost();
-            if (thisCost < minCost) {
+            //TODO this is new not tested, about the running one
+            if (thisCost < minCost && server.get_state() == WebServerWrapper.State.RUNNING) {
                 minWebServer = server;
                 minCost = thisCost;
             } else if (thisCost == minCost) {
@@ -79,6 +80,11 @@ public class WebServersManager {
         webServers.add(new WebServerWrapper(instanceId));
     }
 
+    public void stopLeastWorking(){
+        WebServerWrapper minWebServer = getServerWithLeastWork();
+        minWebServer.shutdownGracefully();
+
+    }
 
     public void createNewWebServer() {
         RunInstancesRequest runInstancesRequest = new RunInstancesRequest();
@@ -150,5 +156,11 @@ public class WebServersManager {
             wsFullness.add(ws.getWorkFullness());
         }
         return wsFullness;
+    }
+
+    public void removeWebServer(WebServerWrapper ws){
+        TerminateInstancesRequest request = new TerminateInstancesRequest().withInstanceIds(ws.get_id());
+        ec2.terminateInstances(request);
+        webServers.remove(ws);
     }
 }
