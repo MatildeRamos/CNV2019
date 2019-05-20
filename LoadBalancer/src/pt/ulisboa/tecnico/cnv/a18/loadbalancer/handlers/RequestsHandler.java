@@ -68,7 +68,7 @@ public class RequestsHandler implements HttpHandler {
 
 			URL url = new URL("http://" + server.getAddress() + "/climb?" + request);
 			System.out.println("Sending to ec2 WebServer > Query:\t" + url.toString());
-            //TODO maybe we should store information to know that an instance is calculating the request's response
+
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
 			con.setRequestProperty("Request_ID", requestId); //Unique identifier for the request
