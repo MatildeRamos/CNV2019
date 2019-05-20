@@ -4,6 +4,9 @@ import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedScanList;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
@@ -72,11 +75,21 @@ public class Storage extends AbstractStorage{
         mapper.save(entry);
     }
 
+    public static PaginatedScanList<MetricsStorage> getRequestMetricsToProcess() {
+        HashMap<String, AttributeValue> values = new HashMap<>();
+        values.put(":zero", new AttributeValue().withN(String.valueOf(0)));
+        return mapper.scan(MetricsStorage.class, new DynamoDBScanExpression()
+                .withFilterExpression("methodsNumber > :zero").withExpressionAttributeValues(values));
+    }
 
 
     public static void get(String key){
         MetricsStorage entry = mapper.load(MetricsStorage.class, key);
         System.out.println("got " + entry.getRequestAttribute().getKey());
+    }
+
+    public static void removeMetric(MetricsStorage ms){
+        mapper.delete(ms);
     }
 
 }

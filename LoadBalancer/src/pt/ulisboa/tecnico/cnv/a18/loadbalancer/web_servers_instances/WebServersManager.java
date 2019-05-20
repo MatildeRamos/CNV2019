@@ -4,11 +4,19 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedParallelScanList;
+import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedScanList;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.*;
+import pt.ulisboa.tecnico.cnv.a18.loadbalancer.storage.EstimateStorage;
+import pt.ulisboa.tecnico.cnv.a18.storage.db.MetricsStorage;
+import pt.ulisboa.tecnico.cnv.a18.storage.db.Storage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 // Singleton
 public class WebServersManager {
@@ -45,7 +53,20 @@ public class WebServersManager {
 
         @Override
         public void run() {
-
+            Map<String, AttributeValue> values = new HashMap<>();
+            values.put(":zero", new AttributeValue().withN(String.valueOf(0)));
+            PaginatedScanList<MetricsStorage> metrics = Storage.getRequestMetricsToProcess();
+            if(metrics.isEmpty() || metrics == null){
+                return;
+            }
+            else {
+                for(MetricsStorage metric : metrics){
+                    EstimateStorage estimative = new EstimateStorage(metric.getRequestAttribute());
+                    double mpa = metric.getMethodsNumber()/estimative.getArea();
+                    estimative.setMethodsPerArea(mpa);
+                    Storage.removeMetric(metric);
+                }
+            }
 
         }
     }

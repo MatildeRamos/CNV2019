@@ -5,7 +5,7 @@ import pt.ulisboa.tecnico.cnv.a18.storage.Request;
 
 @DynamoDBTable(tableName = "EstimateStorage")
 public class EstimateStorage {
-    private int methodsPerArea;
+    private double methodsPerArea;
     private Request request;
     private String strategy;
     private int area;
@@ -40,11 +40,11 @@ public class EstimateStorage {
     }
 
     @DynamoDBAttribute(attributeName = "methodsPerArea")
-    public int getMethodsPerArea() {
+    public double getMethodsPerArea() {
         return methodsPerArea;
     }
 
-    public void setMethodsPerArea(int methodsPerArea) {
+    public void setMethodsPerArea(double methodsPerArea) {
         this.methodsPerArea = methodsPerArea;
     }
 
