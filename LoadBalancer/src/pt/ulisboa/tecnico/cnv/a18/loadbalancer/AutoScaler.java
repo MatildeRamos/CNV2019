@@ -1,6 +1,5 @@
 package pt.ulisboa.tecnico.cnv.a18.loadbalancer;
 
-import com.amazonaws.services.ec2.model.Status;
 import pt.ulisboa.tecnico.cnv.a18.loadbalancer.web_servers_instances.WebServersManager;
 
 import java.util.Timer;
@@ -17,7 +16,6 @@ public class AutoScaler implements Runnable {
     @Override
     public void run() {
         //TODO check this out
-        webServersManager.createNewWebServer();
         _statusCheckerTimer.schedule(new StatusCheckerTask(), 0, 30000); //TODO value to think about
     }
 

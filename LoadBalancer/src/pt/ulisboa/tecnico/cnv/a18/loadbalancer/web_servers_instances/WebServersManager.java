@@ -9,22 +9,21 @@ import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 // Singleton
 public class WebServersManager {
     static AmazonEC2 ec2;
 
-    private static final WebServersManager webServersManager = new WebServersManager();
     private static ArrayList<WebServerWrapper> webServers = new ArrayList<>();
-    // Actual cost for a web server instance
-    private ArrayList<Integer> totalCost = new ArrayList<>();
+    private static final WebServersManager webServersManager = new WebServersManager();
+    //TODO Locks atencao a acessos por diferentes threads
 
     private WebServersManager() {
         init();
+        addExistingInstances();
     }
 
-    public static WebServersManager getInstance() {
+    public synchronized static WebServersManager getInstance() {
         return webServersManager;
     }
 
@@ -49,21 +48,35 @@ public class WebServersManager {
     }
 
     //TODO maybe argument with cost of request and search the adequate server
-    public WebServerWrapper getWebServer(int requestCode) {
+    public WebServerWrapper getWebServer(int requestCost) {
         //choosing instance with less "work" TODO see if this is to simple, maybe if progress is incorporate
-        int minInd = minIndex(totalCost);
-        //Add to the curret cost of a server requests, the cost of the new request
-        totalCost.set(minInd, totalCost.get(minInd) + requestCode);
-        return webServers.get(minInd);
+        WebServerWrapper server = getServerWithLeastWork();
+        //Add to the current cost of a server requests, the cost of the new request
+        server.incrementCost(requestCost);
+        return server;
     }
 
-    private static int minIndex (ArrayList<Integer> costs) {
-        return costs.indexOf (Collections.min(costs)); }
+    private static WebServerWrapper getServerWithLeastWork() {
+        long minCost = Long.MAX_VALUE;
+        WebServerWrapper minWebServer = null;
+        long thisCost;
+        for (WebServerWrapper server : webServers) {
+            thisCost = server.getCost();
+            if (thisCost < minCost) {
+                minWebServer = server;
+                minCost = thisCost;
+            } else if (thisCost == minCost) {
+                //TODO
+            }
+        }
+        return minWebServer;
+    }
 
 
     private void addWebServer(String instanceId) {
         webServers.add(new WebServerWrapper(instanceId));
     }
+
 
     public void createNewWebServer() {
         RunInstancesRequest runInstancesRequest = new RunInstancesRequest();
@@ -93,7 +106,9 @@ public class WebServersManager {
             DescribeInstancesResult response = ec2.describeInstances(request);
 
             String id;
-            String state = "";
+            String imageId;
+            String instanceType;
+            String state;
             String ipAddress;
             for(Reservation reservation : response.getReservations()) {
                 for(Instance instance : reservation.getInstances()) {
@@ -105,11 +120,14 @@ public class WebServersManager {
                                     "monitoring state %s " +
                                     "and ip address %s\n",
                             id = instance.getInstanceId(),
-                            instance.getImageId(),
-                            instance.getInstanceType(),
+                            imageId = instance.getImageId(),
+                            instanceType = instance.getInstanceType(),
                             state = instance.getState().getName(),
                             instance.getMonitoring().getState(),
                             ipAddress = instance.getPublicIpAddress());
+                    if(imageId.equals("ami-0c80afef49b12a338") && instanceType.equals("t2.micro")) {
+                        webServers.add(new WebServerWrapper(id,  ipAddress));
+                    }
                 }
             }
 
@@ -118,9 +136,9 @@ public class WebServersManager {
             if(response.getNextToken() == null) {
                 done = true;
             }
-            if(!state.equals("terminated") && !state.equals("shutting-down") && !state.equals("")) {
-
-            }
+        }
+        if(webServers.isEmpty()) {
+            createNewWebServer();
         }
     }
 }

@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.UUID;
 
 public class RequestsHandler implements HttpHandler {
@@ -51,8 +50,7 @@ public class RequestsHandler implements HttpHandler {
     private byte[] redirectRequest(String request, int requestCost) {
 		try {
 			//Create connection with the chosen ec2 webServer instance
-			//TODO receber um custo para o request, e escolher a vm para onde o enviar consoante o custo dos pedidos que ela já estiver a executar
-			WebServerWrapper server = serversManager.getWebServer(requestCost); //TODO send a cost of the request and then the best fitted server will be chosen
+			WebServerWrapper server = serversManager.getWebServer(requestCost);
 			//TODO idle time do load balancer (esperar x tempo por resposta, passado esse tempo - a vm deve ter morrido - reenviar o pedido para outra vm)
 
 			URL url = new URL("http://" + server.getAddress() + "/climb?" + request);
@@ -61,7 +59,6 @@ public class RequestsHandler implements HttpHandler {
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestProperty("Request_ID", UUID.randomUUID().toString()); //Unique identifier for the request
 			con.setRequestMethod("GET");
-
 
 
 			System.out.println("Waiting for response...");
@@ -73,7 +70,8 @@ public class RequestsHandler implements HttpHandler {
 
 			System.out.println("Response received");
 
-			//TODO take note that the web server instance has already ended the request and returned the response
+            // Server has ended request remove the cost associated with the request
+            server.decrementCost(requestCost);
 
 			return buffer;
 

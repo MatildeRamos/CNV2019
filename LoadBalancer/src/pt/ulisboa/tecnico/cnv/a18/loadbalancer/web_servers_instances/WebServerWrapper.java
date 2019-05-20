@@ -14,6 +14,7 @@ public class WebServerWrapper {
     private State _state;
     private String _id;
     private String _address;
+    private long _cost = 0;
     private Timer t1;
 
     WebServerWrapper(String id, String ip) {
@@ -51,7 +52,7 @@ public class WebServerWrapper {
                         ipAddress = instance.getPublicIpAddress();
                     }
                 }
-                if(state.equals("running") && ipAddress != null) {
+                if(state.equals(InstanceStateName.Running.toString()) && ipAddress != null) {
                     System.out.printf(
                             "Created instance with id %s, " +
                                     "AMI %s, " +
@@ -81,6 +82,18 @@ public class WebServerWrapper {
 
     public String getAddress() {
         return _address;
+    }
+
+    public void incrementCost(long cost) {
+        _cost += cost;
+    }
+
+    public void decrementCost(long cost) {
+        _cost -= cost;
+    }
+
+    long getCost() {
+        return _cost;
     }
 
     public State get_state() {
