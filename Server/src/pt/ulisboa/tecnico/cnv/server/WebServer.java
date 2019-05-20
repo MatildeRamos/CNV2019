@@ -19,6 +19,9 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import pt.ulisboa.tecnico.cnv.a18.storage.Request;
+import pt.ulisboa.tecnico.cnv.a18.storage.RequestParser;
+import pt.ulisboa.tecnico.cnv.a18.storage.db.AbstractStorage;
 import pt.ulisboa.tecnico.cnv.solver.Solver;
 import pt.ulisboa.tecnico.cnv.solver.SolverArgumentParser;
 import pt.ulisboa.tecnico.cnv.solver.SolverFactory;
@@ -74,6 +77,10 @@ public class WebServer {
 			for(String p: params) {
 				System.out.println(p);
 			}
+
+			String requestId = t.getRequestHeaders().getFirst("Request_ID");
+			Request request = new RequestParser(query).parseRequest(requestId);
+			AbstractStorage.getStorage().setNewRequest(Long.parseLong(requestId), request);
 
 
 			// Store as if it was a direct call to SolverMain.

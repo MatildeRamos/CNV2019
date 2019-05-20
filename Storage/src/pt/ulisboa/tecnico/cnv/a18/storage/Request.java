@@ -6,15 +6,16 @@ public class Request {
     private int x1;
     private int y0;
     private int y1;
+    private int s0;
+    private int s1;
     private int height;
     private int width;
-    private int area;
     private String strategy;
     private String image;
 
     public Request(){}
 
-    public Request(String key, int x0, int x1, int y0, int y1, int height, int width, String strategy, String image) {
+    public Request(String key, int x0, int x1, int y0, int y1, int s0, int s1, int height, int width, String strategy, String image) {
         this.key = key;
         this.x0 = x0;
         this.x1 = x1;
@@ -24,7 +25,6 @@ public class Request {
         this.width = width;
         this.strategy = strategy;
         this.image = image;
-        this.area = height*width;
     }
 
     public String getKey(){
@@ -67,6 +67,22 @@ public class Request {
         this.y1 = y1;
     }
 
+    public int getS0() {
+        return s0;
+    }
+
+    public void setS0(int s0) {
+        this.s0 = s0;
+    }
+
+    public int getS1() {
+        return s1;
+    }
+
+    public void setS1(int s1) {
+        this.s1 = s1;
+    }
+
     public int getHeight() {
         return height;
     }
@@ -97,13 +113,5 @@ public class Request {
 
     public void setImage(String image) {
         this.image = image;
-    }
-
-    public void setArea(int area) {
-        this.area = area;
-    }
-
-    public int getArea() {
-        return area;
     }
 }

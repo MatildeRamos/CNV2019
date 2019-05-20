@@ -9,10 +9,17 @@ import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
 import pt.ulisboa.tecnico.cnv.a18.storage.Request;
 
-public class Storage {
+import java.util.HashMap;
+
+public class Storage extends AbstractStorage{
 
     static AmazonDynamoDB dynamoDB;
     static DynamoDBMapper mapper;
+    HashMap<Long, Request> currentRequests = new HashMap<>();
+
+    public void setNewRequest(Long id, Request request){
+        currentRequests.put(id, request);
+    }
 
     private static void init() throws Exception {
         ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
@@ -33,37 +40,43 @@ public class Storage {
 
 
         mapper = new DynamoDBMapper(dynamoDB);
-        CreateTableRequest request = mapper.generateCreateTableRequest(RequestEntry.class);
+        CreateTableRequest request = mapper.generateCreateTableRequest(MetricsStorage.class);
         request.setProvisionedThroughput(new ProvisionedThroughput(10L, 10L)); //TODO
         TableUtils.createTableIfNotExists(dynamoDB, request);
-        TableUtils.waitUntilActive(dynamoDB, "TableName");
+        TableUtils.waitUntilActive(dynamoDB, "MetricsStorage");
     }
 
     public static void main(String[] args) throws Exception {
         init();
-        store();
-        get();
 
     }
 
-    public static void store(){
-        String hashkey = "105L";
-        RequestEntry entry = mapper.load(RequestEntry.class, hashkey);
-        //Request request = new Request(hashkey);
+    public void storeNumberOfMethods(Long tid, long mcount){
+        Request request = currentRequests.get(tid);
+        MetricsStorage entry = mapper.load(MetricsStorage.class, request.getKey());
         if (entry == null){
-            //entry = new RequestEntry(request);
-
+            entry = new MetricsStorage(request);
         }
-        else{
-            System.out.println("nothing to do here...");
-        }
+        entry.setMethodsNumber(mcount);
+        entry.setArea(request.getHeight() * request.getWidth());
+        entry.setStrategy(request.getStrategy());
         mapper.save(entry);
     }
 
-    public static void get(){
-        String hashkey = "105L";
-        RequestEntry entry = mapper.load(RequestEntry.class, hashkey);
-        System.out.println("got " + entry.request.getKey());
+    public void storeEstimatedMethodsNumber(Request request, Long estimate){
+        MetricsStorage entry = mapper.load(MetricsStorage.class, request.getKey());
+        if (entry == null){
+            entry = new MetricsStorage(request);
+        }
+        entry.setEstimatedMethodsNumber(estimate);
+        mapper.save(entry);
+    }
+
+
+
+    public static void get(String key){
+        MetricsStorage entry = mapper.load(MetricsStorage.class, key);
+        System.out.println("got " + entry.getRequestAttribute().getKey());
     }
 
 }

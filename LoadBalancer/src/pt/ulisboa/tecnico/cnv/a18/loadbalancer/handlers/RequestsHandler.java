@@ -5,6 +5,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import pt.ulisboa.tecnico.cnv.a18.loadbalancer.web_servers_instances.WebServerWrapper;
 import pt.ulisboa.tecnico.cnv.a18.loadbalancer.web_servers_instances.WebServersManager;
+import pt.ulisboa.tecnico.cnv.a18.storage.Request;
+import pt.ulisboa.tecnico.cnv.a18.storage.RequestParser;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -61,8 +63,11 @@ public class RequestsHandler implements HttpHandler {
 			System.out.println("Sending to ec2 WebServer > Query:\t" + url.toString());
             //TODO maybe we should store information to know that an instance is calculating the request's response
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			String requestId = UUID.randomUUID().toString();
 			con.setRequestProperty("Request_ID", UUID.randomUUID().toString()); //Unique identifier for the request
 			con.setRequestMethod("GET");
+
+            Request newRequest = new RequestParser(request).parseRequest(requestId);
 
 
 			System.out.println("Waiting for response...");

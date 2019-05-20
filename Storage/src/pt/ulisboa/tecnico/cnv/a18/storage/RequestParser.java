@@ -18,12 +18,10 @@ public class RequestParser {
             String[] div = p.split("=");
                 switch (div[0]){
                     case "h":
-                        height = Integer.parseInt(div[1]);
-                        request.setHeight(height);
+                        request.setHeight(Integer.parseInt(div[1]));
                         break;
                     case "w":
-                        width = Integer.parseInt(div[1]);
-                        request.setWidth(width);
+                        request.setWidth(Integer.parseInt(div[1]));
                         break;
                     case "x0":
                         request.setX0(Integer.parseInt(div[1]));
@@ -45,7 +43,6 @@ public class RequestParser {
                         break;
                 }
         }
-        request.setArea(height*width);
         return request;
     }
 }
