@@ -51,8 +51,6 @@ public class WebServersManager {
     public WebServerWrapper getWebServer(long requestCost) {
         //choosing instance with less "work" TODO see if this is to simple, maybe if progress is incorporate
         WebServerWrapper server = getServerWithLeastWork();
-        //Add to the current cost of a server requests, the cost of the new request
-        server.incrementCost(requestCost);
         return server;
     }
 

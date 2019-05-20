@@ -10,13 +10,13 @@ public class AutoScaler implements Runnable {
     private WebServersManager webServersManager = WebServersManager.getInstance();
     private Timer _statusCheckerTimer = new Timer();
 
-    private int MIN_NUMBER_INSTANCES = 2;
-    private int MAX_NUMBER_INSTANCES = 15;
+    private int MIN_NUMBER_INSTANCES = 2; //TODO properties file
+    private int MAX_NUMBER_INSTANCES = 15; //TODO properties file
 
     @Override
     public void run() {
         //TODO check this out
-        _statusCheckerTimer.schedule(new StatusCheckerTask(), 0, 30000); //TODO value to think about
+        _statusCheckerTimer.schedule(new StatusCheckerTask(), 0, 30000); //TODO value to think about (properties file)
     }
 
     //TODO Probably act as health checker

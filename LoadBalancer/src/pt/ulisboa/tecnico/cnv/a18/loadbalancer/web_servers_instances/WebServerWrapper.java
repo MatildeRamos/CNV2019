@@ -2,7 +2,9 @@ package pt.ulisboa.tecnico.cnv.a18.loadbalancer.web_servers_instances;
 
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.model.*;
+import pt.ulisboa.tecnico.cnv.a18.storage.Request;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -15,6 +17,8 @@ public class WebServerWrapper {
     private String _id;
     private String _address;
     private long _totalCost = 0;
+    private HashMap<Request, Long> _currentRequests = new HashMap<>();
+
     private Timer t1;
 
 
@@ -104,5 +108,15 @@ public class WebServerWrapper {
 
     public void set_state(State _state) {
         this._state = _state;
+    }
+
+    public void endRequest(Request request) {
+        _totalCost -= _currentRequests.get(request);
+        _currentRequests.remove(request);
+    }
+
+    public void addRequest(Request request, long cost) {
+        _currentRequests.put(request, cost);
+        _totalCost += cost;
     }
 }

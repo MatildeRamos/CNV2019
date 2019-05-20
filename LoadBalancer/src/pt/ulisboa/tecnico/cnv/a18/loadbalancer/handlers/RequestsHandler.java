@@ -55,20 +55,23 @@ public class RequestsHandler implements HttpHandler {
     //TODO what should this return, as to do with what we will be doing from here on
     private byte[] redirectRequest(String request, long requestCost) {
 		try {
+            String requestId = UUID.randomUUID().toString();
+
 			//Create connection with the chosen ec2 webServer instance
 			WebServerWrapper server = serversManager.getWebServer(requestCost);
 			//TODO idle time do load balancer (esperar x tempo por resposta, passado esse tempo - a vm deve ter morrido - reenviar o pedido para outra vm)
+
+            Request newRequest = new RequestParser(request).parseRequest(requestId);
+
+            //Add to the current cost of a server requests, the cost of the new request
+            server.addRequest(newRequest, requestCost);
 
 			URL url = new URL("http://" + server.getAddress() + "/climb?" + request);
 			System.out.println("Sending to ec2 WebServer > Query:\t" + url.toString());
             //TODO maybe we should store information to know that an instance is calculating the request's response
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			String requestId = UUID.randomUUID().toString();
-			con.setRequestProperty("Request_ID", UUID.randomUUID().toString()); //Unique identifier for the request
+			con.setRequestProperty("Request_ID", requestId); //Unique identifier for the request
 			con.setRequestMethod("GET");
-
-            Request newRequest = new RequestParser(request).parseRequest(requestId);
-
 
 			System.out.println("Waiting for response...");
 
@@ -80,7 +83,7 @@ public class RequestsHandler implements HttpHandler {
 			System.out.println("Response received");
 
             // Server has ended request remove the cost associated with the request
-            server.decrementCost(requestCost);
+            server.endRequest(newRequest);
 
 			return buffer;
 
