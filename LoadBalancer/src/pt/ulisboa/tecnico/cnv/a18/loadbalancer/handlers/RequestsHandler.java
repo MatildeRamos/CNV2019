@@ -3,6 +3,8 @@ package pt.ulisboa.tecnico.cnv.a18.loadbalancer.handlers;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import pt.ulisboa.tecnico.cnv.a18.loadbalancer.LoadBalancer;
+import pt.ulisboa.tecnico.cnv.a18.loadbalancer.LoadBalancerMain;
 import pt.ulisboa.tecnico.cnv.a18.loadbalancer.storage.LBStorage;
 import pt.ulisboa.tecnico.cnv.a18.loadbalancer.web_servers_instances.WebServerWrapper;
 import pt.ulisboa.tecnico.cnv.a18.loadbalancer.web_servers_instances.WebServersManager;
@@ -47,6 +49,8 @@ public class RequestsHandler implements HttpHandler {
         hdrs.add("Access-Control-Allow-Credentials", "true");
         hdrs.add("Access-Control-Allow-Methods", "POST, GET, HEAD, OPTIONS");
         hdrs.add("Access-Control-Allow-Headers", "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+
+        WebServersManager.getInstance().incrementCounter();
 
         final OutputStream os = httpExchange.getResponseBody();
         os.write(response);

@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cnv.solver;
+//package pt.ulisboa.tecnico.cnv;
 
 /* ICount.java
  * Sample program using BIT -- counts the number of instructions executed.
@@ -35,6 +35,7 @@ public class MyBITTool {
         //File file_in = new File(argv[0]);
         //String infilenames[] = file_in.list();
         String outputFolder = argv[1];
+        System.out.println("hello");
         //for (int i = 0; i < infilenames.length; i++) {
         //    String infilename = infilenames[i];
         if (argv[0].endsWith(".class")) {
@@ -49,7 +50,7 @@ public class MyBITTool {
 
                 if (routine.getMethodName().contentEquals("solveImage") || routine.getMethodName().contentEquals("solve")) {
                     //method count
-                    routine.addAfter("MyBITTool", "printCount", ci.getClassName());
+                    routine.addAfter("MyBITTool", "storeCount", ci.getClassName());
                 }
                 ci.write(outputFolder + System.getProperty("file.separator") + argv[0]);
             }
@@ -70,6 +71,7 @@ public class MyBITTool {
     }
 
     public static synchronized void storeCount(String foo){
+        System.out.println("Tool done!");
         Long id = Thread.currentThread().getId();
         AbstractStorage.getStorage().storeNumberOfMethods(id, m_count.get(id));
         m_count.put(id, null);

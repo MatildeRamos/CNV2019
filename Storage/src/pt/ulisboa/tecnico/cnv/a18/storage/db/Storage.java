@@ -17,6 +17,10 @@ public class Storage extends AbstractStorage{
     static DynamoDBMapper mapper;
     HashMap<Long, Request> currentRequests = new HashMap<>();
 
+    public Storage() throws Exception{
+        init();
+    }
+
     public void setNewRequest(Long id, Request request){
         currentRequests.put(id, request);
     }
@@ -46,10 +50,6 @@ public class Storage extends AbstractStorage{
         TableUtils.waitUntilActive(dynamoDB, "MetricsStorage");
     }
 
-    public static void main(String[] args) throws Exception {
-        init();
-
-    }
 
     public void storeNumberOfMethods(Long tid, long mcount){
         Request request = currentRequests.get(tid);

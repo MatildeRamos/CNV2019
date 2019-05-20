@@ -14,6 +14,11 @@ import java.util.ArrayList;
 public class WebServersManager {
     static AmazonEC2 ec2;
 
+    int requestCounter = 0;
+    private int NUMBER_OF_REQUESTS_BETWEEN_UPDATES = 5;
+
+
+
     private static ArrayList<WebServerWrapper> webServers = new ArrayList<>();
     private static final WebServersManager webServersManager = new WebServersManager();
     //TODO Locks atencao a acessos por diferentes threads
@@ -25,6 +30,24 @@ public class WebServersManager {
 
     public synchronized static WebServersManager getInstance() {
         return webServersManager;
+    }
+
+    public synchronized void incrementCounter(){
+        requestCounter++;
+        if(requestCounter == NUMBER_OF_REQUESTS_BETWEEN_UPDATES){
+            requestCounter = 0;
+            Thread t = new Thread(new UpdateEstimativeTask());
+        }
+    }
+
+    //TODO isto devia ser
+    public class UpdateEstimativeTask implements Runnable {
+
+        @Override
+        public void run() {
+
+
+        }
     }
 
     public int getNumServer(){

@@ -6,7 +6,7 @@ public class RequestParser {
     String example = "http://localhost:8001/climb?w=512&h=512&x0=0&x1=512&y0=0&y1=512&xS=0&yS=0&s=BFS&i=datasets/RANDOM_HILL_512x512_2019-02-27_09-46-42.dat";
 
     public RequestParser(String requestReceived){
-        requestReceived = requestReceived;
+        this.requestReceived = requestReceived;
     }
 
     public Request parseRequest(String id){
