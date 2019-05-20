@@ -7,5 +7,41 @@
     </content>
     <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../aws-java-sdk-1.11.550/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../aws-java-sdk-1.11.550/lib" />
+        </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/../aws-java-sdk-1.11.550/lib" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/../aws-java-sdk-1.11.550/lib" recursive="false" type="SOURCES" />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../aws-java-sdk-1.11.550/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../aws-java-sdk-1.11.550/lib" />
+        </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/../aws-java-sdk-1.11.550/lib" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/../aws-java-sdk-1.11.550/lib" recursive="false" type="SOURCES" />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../aws-java-sdk-1.11.550/third-party/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/../aws-java-sdk-1.11.550/third-party/lib" recursive="false" />
+      </library>
+    </orderEntry>
   </component>
 </module>
