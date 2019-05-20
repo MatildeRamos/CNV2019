@@ -10,8 +10,8 @@ public class AutoScaler implements Runnable {
     private WebServersManager webServersManager = WebServersManager.getInstance();
     private Timer _statusCheckerTimer = new Timer();
 
-    private int MIN_NUMBER_INSTANCES;
-    private int MAX_NUMBER_INSTANCES;
+    private int MIN_NUMBER_INSTANCES = 2;
+    private int MAX_NUMBER_INSTANCES = 15;
 
     @Override
     public void run() {
@@ -19,6 +19,7 @@ public class AutoScaler implements Runnable {
         _statusCheckerTimer.schedule(new StatusCheckerTask(), 0, 30000); //TODO value to think about
     }
 
+    //TODO Probably act as health checker
     class StatusCheckerTask extends TimerTask {
 
         @Override

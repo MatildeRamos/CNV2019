@@ -23,8 +23,8 @@ public class RequestsHandler implements HttpHandler {
         // Get the query.
         final String query = httpExchange.getRequestURI().getQuery();
 
-        //TODO aqui avaliar a situacao de modo a saber para que instancia redirecionar o pedido (metricas e cenas)
-        int requestCode = 1;
+        //Calculate request Cost through estimations
+        long requestCode = computeRequestCost(query);//TODO tavam a falar de um objecto request, será um bom sitio para usalo I guess
 
         byte[] response = redirectRequest(query, requestCode);
 
@@ -46,8 +46,12 @@ public class RequestsHandler implements HttpHandler {
         System.out.println("> Sent response to " + httpExchange.getRemoteAddress().toString());
     }
 
+    private long computeRequestCost(String query) {
+        return 1; //TODO implement
+    }
+
     //TODO what should this return, as to do with what we will be doing from here on
-    private byte[] redirectRequest(String request, int requestCost) {
+    private byte[] redirectRequest(String request, long requestCost) {
 		try {
 			//Create connection with the chosen ec2 webServer instance
 			WebServerWrapper server = serversManager.getWebServer(requestCost);

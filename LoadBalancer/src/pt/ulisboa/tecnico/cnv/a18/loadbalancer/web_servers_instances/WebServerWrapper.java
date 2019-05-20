@@ -14,8 +14,10 @@ public class WebServerWrapper {
     private State _state;
     private String _id;
     private String _address;
-    private long _cost = 0;
+    private long _totalCost = 0;
     private Timer t1;
+
+
 
     WebServerWrapper(String id, String ip) {
         _id = id;
@@ -85,15 +87,15 @@ public class WebServerWrapper {
     }
 
     public void incrementCost(long cost) {
-        _cost += cost;
+        _totalCost += cost;
     }
 
     public void decrementCost(long cost) {
-        _cost -= cost;
+        _totalCost -= cost;
     }
 
     long getCost() {
-        return _cost;
+        return _totalCost;
     }
 
     public State get_state() {

@@ -48,7 +48,7 @@ public class WebServersManager {
     }
 
     //TODO maybe argument with cost of request and search the adequate server
-    public WebServerWrapper getWebServer(int requestCost) {
+    public WebServerWrapper getWebServer(long requestCost) {
         //choosing instance with less "work" TODO see if this is to simple, maybe if progress is incorporate
         WebServerWrapper server = getServerWithLeastWork();
         //Add to the current cost of a server requests, the cost of the new request
