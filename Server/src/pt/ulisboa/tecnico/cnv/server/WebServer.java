@@ -78,7 +78,7 @@ public class WebServer {
 				System.out.println(p);
 			}
 
-			String requestId = t.getRequestHeaders().getFirst("Request_ID");
+			String requestId = t.getRequestHeaders().getFirst("Request_ID"); //TODO verificar que é aqui
 			Request request = new RequestParser(query).parseRequest(requestId);
 			AbstractStorage.getStorage().setNewRequest(Long.parseLong(requestId), request);
 

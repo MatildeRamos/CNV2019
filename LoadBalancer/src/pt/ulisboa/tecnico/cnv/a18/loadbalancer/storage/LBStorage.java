@@ -17,11 +17,23 @@ import java.util.HashMap;
 import java.util.List;
 
 public class LBStorage {
+    private static LBStorage storage;
     static AmazonDynamoDB dynamoDB;
     static DynamoDBMapper mapper;
     static int AREA_LIMIT = 50000;
 
-    private static void init() throws Exception {
+    public static synchronized LBStorage getStorage() {
+        if (storage == null) {
+            storage = new LBStorage();
+        }
+        return storage;
+    }
+
+   private LBStorage(){
+        init();
+   }
+
+    private static void init() {
         ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
         //try {
         credentialsProvider.getCredentials();
@@ -43,12 +55,11 @@ public class LBStorage {
         CreateTableRequest request = mapper.generateCreateTableRequest(EstimateStorage.class);
         request.setProvisionedThroughput(new ProvisionedThroughput(10L, 10L)); //TODO
         TableUtils.createTableIfNotExists(dynamoDB, request);
-        TableUtils.waitUntilActive(dynamoDB, "EstimateStorage");
-    }
-
-    public static void main(String[] args) throws Exception {
-        init();
-
+        try {
+            TableUtils.waitUntilActive(dynamoDB, "EstimateStorage");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public long calcExpectedNumberofMethods(Request request){
@@ -70,7 +81,7 @@ public class LBStorage {
 
             List<EstimateStorage> iList =  mapper.query(EstimateStorage.class, queryExpression);
             if (iList.isEmpty() || iList == null){
-                if(request.getStrategy().equals("AStar")){ //TODO ver se é assim
+                if(request.getStrategy().equals("ASTAR")){
                     return estimate.getArea() * 500;
                 }
                 else{
