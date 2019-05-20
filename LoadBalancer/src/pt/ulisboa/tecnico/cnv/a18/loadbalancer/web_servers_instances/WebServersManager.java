@@ -45,6 +45,7 @@ public class WebServersManager {
         if(requestCounter == NUMBER_OF_REQUESTS_BETWEEN_UPDATES){
             requestCounter = 0;
             Thread t = new Thread(new UpdateEstimativeTask());
+            t.start();
         }
     }
 
