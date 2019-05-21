@@ -38,6 +38,9 @@ public class RequestsHandler implements HttpHandler {
         byte[] response = null;
         while (response == null){
             response = redirectRequest(query, requestCode, requestId, newRequest);
+            if (response == null) {
+                System.out.println("Connection timeout, sending request to another instance");
+            }
         }
 
         // Send response to browser.
@@ -60,7 +63,7 @@ public class RequestsHandler implements HttpHandler {
     }
 
     private long computeRequestCost(Request request) {
-        return LBStorage.getStorage().calcExpectedNumberofMethods(request);
+        return 20000L;//LBStorage.getStorage().calcExpectedNumberofMethods(request);
     }
 
     //TODO what should this return, as to do with what we will be doing from here on
@@ -77,7 +80,7 @@ public class RequestsHandler implements HttpHandler {
 			System.out.println("Sending to ec2 WebServer > Query:\t" + url.toString());
 
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
+            con.setReadTimeout(90000);//TODO properties file
 			con.setRequestProperty("Request_ID", requestId); //Unique identifier for the request
 			con.setRequestMethod("GET");
 
@@ -96,9 +99,7 @@ public class RequestsHandler implements HttpHandler {
 			return buffer;
 
 		} catch(IOException e) {
-		    //TODO
-			e.printStackTrace();
-            server.endRequest(req);
+		    // Read timeout exception
             return null; //handler catches it and tries again
 		}
     }

@@ -20,8 +20,12 @@ public class Storage extends AbstractStorage{
     static DynamoDBMapper mapper;
     HashMap<Long, Request> currentRequests = new HashMap<>();
 
-    public Storage() throws Exception{
-        init();
+    public Storage(){
+        try {
+            init();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void setNewRequest(Long id, Request request){

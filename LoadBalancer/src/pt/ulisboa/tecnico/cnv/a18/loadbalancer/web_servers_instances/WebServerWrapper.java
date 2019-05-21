@@ -14,7 +14,7 @@ public class WebServerWrapper {
     }
 
     //TODO
-    private final long _maxLoad = 5L;
+    private final long _maxLoad = 100000L;
     private State _state;
     private String _id;
     private String _address;
@@ -24,9 +24,9 @@ public class WebServerWrapper {
     private Timer t1;
 
 
-
     WebServerWrapper(String id, String ip) {
         _id = id;
+        _state = State.RUNNING;
         setAddress(ip);
     }
 
@@ -86,7 +86,9 @@ public class WebServerWrapper {
 
     public synchronized void shutdownGracefully(){
         _state = State.SHUTTING_DOWN;
-
+        if(_totalCost == 0){
+            WebServersManager.getInstance().removeWebServer(this);
+        }
     }
 
     public String get_id(){

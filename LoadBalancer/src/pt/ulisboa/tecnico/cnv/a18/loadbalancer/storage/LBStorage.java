@@ -66,7 +66,8 @@ public class LBStorage {
         EstimateStorage estimate = new EstimateStorage(request);
         EstimateStorage entry = mapper.load(EstimateStorage.class, estimate.getStrategy(), estimate.getArea());
         if (entry != null){
-            return entry.getMethodsPerArea() * estimate.getArea(); //TODO ver onde isto é definido
+            Double d = new Double(entry.getMethodsPerArea() * estimate.getArea());
+            return  d.longValue(); //TODO ver onde isto é definido
         }
         else{
             HashMap<String, AttributeValue> newEstimate = new HashMap<>();

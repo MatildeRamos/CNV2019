@@ -14,8 +14,8 @@ public class AutoScaler implements Runnable {
 
     private static int MIN_NUMBER_INSTANCES = 1; //TODO properties file
     private static int MAX_NUMBER_INSTANCES = 15; //TODO properties file
-    private static int SEC_OVERLOAD = 30; //TODO properties file
-    private static int SEC_UNDERLOAD = 30; //TODO properties file
+    private static int SEC_OVERLOAD = 30000; //TODO properties file
+    private static int SEC_UNDERLOAD = 30000; //TODO properties file
     private static int HIGH_TRESHHOLD = 80; //TODO properties file
     private static int LOW_TRESHHOLD = 30; //TODO properties file
 
@@ -29,7 +29,7 @@ public class AutoScaler implements Runnable {
     @Override
     public void run() {
         //TODO check this out
-        _statusCheckerTimer.schedule(new StatusCheckerTask(), 0, 1000); //1 em 1 seg, dps o contador ate o sec overload
+        _statusCheckerTimer.schedule(new StatusCheckerTask(), 0, 15000); //15 em 15 seg, dps o contador ate o sec overload
     }
 
     public static int calcOverTresh(ArrayList<Double> wsFullness){
@@ -52,40 +52,47 @@ public class AutoScaler implements Runnable {
         return res;
     }
 
-    //TODO Probably act as health checker
+    // Act as health checker
     class StatusCheckerTask extends TimerTask {
 
         @Override
         public void run() {
-            if(webServersManager.getNumServer() <= increaseGroupSize.get_numServers() ){
+            if(webServersManager.getNumServer() < increaseGroupSize.get_numServers() ){
                 webServersManager.createNewWebServer();
             }
             else {
-                if(webServersManager.getNumServer() >= decreaseGroupSize.get_numServers()){
+                if(webServersManager.getNumServer() > decreaseGroupSize.get_numServers()){
                     webServersManager.stopLeastWorking();
                 }
                 else {
-                    ArrayList wsFullness = webServersManager.getWSFullness();
-                    if(AutoScaler.calcOverTresh(wsFullness) >= webServersManager.getNumServer()-1 ){
+                    ArrayList<Double> wsFullness = webServersManager.getWSFullness();
+                    if(AutoScaler.calcOverTresh(wsFullness) > webServersManager.getNumServer() - 1){
                         AutoScaler.timeStampsOverload++;
                     }
-                    else if(AutoScaler.calcUnderTresh(wsFullness) <= webServersManager.getNumServer() -1 ){
+                    else if(AutoScaler.calcUnderTresh(wsFullness) > webServersManager.getNumServer() - 1){
                         AutoScaler.timeStampsUnderload++;
                     }
                     else {
                         AutoScaler.timeStampsOverload = 0;
                         AutoScaler.timeStampsUnderload = 0;
                     }
-                    if(AutoScaler.timeStampsOverload >= (increaseGroupSize.get_secondsOverThreshold()/1000)){
-                        webServersManager.createNewWebServer();
+                    if(AutoScaler.timeStampsOverload > (increaseGroupSize.get_secondsOverThreshold()/15000)){
+                        if(webServersManager.getNumServer() < decreaseGroupSize.get_numServers()) {
+                            webServersManager.createNewWebServer();
+                        }
                         AutoScaler.timeStampsOverload = 0;
                     }
-                    else if(AutoScaler.timeStampsUnderload >= (decreaseGroupSize.get_secondsOverThreshold()/1000)){
-                        webServersManager.stopLeastWorking();
+                    else if(AutoScaler.timeStampsUnderload > (decreaseGroupSize.get_secondsOverThreshold()/15000)){
+                        if(webServersManager.getNumServer() > increaseGroupSize.get_numServers()) {
+                            webServersManager.stopLeastWorking();
+                        }
                         AutoScaler.timeStampsUnderload = 0;
                     }
                 }
             }
+
+            webServersManager.healthChecks();
+
         }
     }
 }

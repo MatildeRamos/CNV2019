@@ -49,7 +49,6 @@ public class WebServersManager {
         }
     }
 
-    //TODO isto devia ser
     public class UpdateEstimativeTask implements Runnable {
 
         @Override
@@ -110,6 +109,7 @@ public class WebServersManager {
         for (WebServerWrapper server : webServers) {
             thisCost = server.getCost();
             //TODO this is new not tested, about the running one
+            WebServerWrapper.State s = server.get_state();
             if (thisCost < minCost && server.get_state() == WebServerWrapper.State.RUNNING) {
                 minWebServer = server;
                 minCost = thisCost;
@@ -148,8 +148,8 @@ public class WebServersManager {
         addWebServer(newInstanceId);
     }
 
-    // Check instances that exist in amazon and "register" them in the loadBalancer
-    private void addExistingInstances() { //TODO this is incomplete and is not beeing used...is it necessary
+    // Check instances that are active in amazon and update them in the loadBalancer knowledge
+    private void addExistingInstances() {
         AmazonEC2 ec2 = WebServersManager.ec2;
 
         boolean done = false;
@@ -166,7 +166,7 @@ public class WebServersManager {
             for(Reservation reservation : response.getReservations()) {
                 for(Instance instance : reservation.getInstances()) {
                     System.out.printf(
-                            "Found instance with id %s, " +
+                            "Found initial instances with id %s, " +
                                     "AMI %s, " +
                                     "type %s, " +
                                     "state %s " +
@@ -195,6 +195,51 @@ public class WebServersManager {
         }
     }
 
+    public void healthChecks() {
+        AmazonEC2 ec2 = WebServersManager.ec2;
+
+        ArrayList<WebServerWrapper> serversKnown = new ArrayList<>();
+
+        boolean done = false;
+
+        DescribeInstancesRequest request = new DescribeInstancesRequest();
+        while(!done) {
+            DescribeInstancesResult response = ec2.describeInstances(request);
+
+            String id;
+            String state;
+            for(Reservation reservation : response.getReservations()) {
+                for(Instance instance : reservation.getInstances()) {
+                    id = instance.getInstanceId();
+                    state = instance.getState().getName();
+                    if(state.equals(InstanceStateName.Running.toString()) || state.equals(InstanceStateName.Pending.toString())) {
+                        for(WebServerWrapper server : webServers) {
+                            if(server.get_id().equals(id)) {
+                                serversKnown.add(server);
+                            }
+                        }
+                    }
+                }
+            }
+
+            request.setNextToken(response.getNextToken());
+
+            if(response.getNextToken() == null) {
+                done = true;
+            }
+        }
+        ArrayList<WebServerWrapper> serversToRemove = new ArrayList<>();
+
+        for(WebServerWrapper server : webServers) {
+            if (!serversKnown.contains(server)) {
+                serversToRemove.add(server);
+            }
+        }
+        for(WebServerWrapper server : serversToRemove) {
+            webServers.remove(server);
+        }
+    }
+
     public ArrayList<Double> getWSFullness(){
         ArrayList<Double> wsFullness = new ArrayList<>();
         for(WebServerWrapper ws : webServers){
@@ -208,4 +253,5 @@ public class WebServersManager {
         ec2.terminateInstances(request);
         webServers.remove(ws);
     }
+
 }

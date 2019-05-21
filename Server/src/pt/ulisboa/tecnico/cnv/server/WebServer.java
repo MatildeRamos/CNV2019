@@ -78,10 +78,10 @@ public class WebServer {
 				System.out.println(p);
 			}
 
-			String dummyId = "1";
+			//String dummyId = "1";
 			String requestId = t.getRequestHeaders().getFirst("Request_ID"); //TODO verificar que é aqui
-			Request request = new RequestParser(query).parseRequest(dummyId);
-			AbstractStorage.getStorage().setNewRequest(Long.parseLong(dummyId), request);
+			Request request = new RequestParser(query).parseRequest(requestId);
+			AbstractStorage.getStorage().setNewRequest(Thread.currentThread().getId(), request);
 
 
 			// Store as if it was a direct call to SolverMain.
